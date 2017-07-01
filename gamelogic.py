@@ -1,4 +1,4 @@
-import random 
+import random
 from copy import copy, deepcopy
 
 class GameLogic:
@@ -10,7 +10,7 @@ class GameLogic:
 	def __init__(self, size):
 		self.gridSize = size
 		self.Reset()
-	
+
 	def Reset(self):
 		self.FillEmptyGrid()
 		self.AddNewNumber()
@@ -28,7 +28,7 @@ class GameLogic:
 		if count < 1: return False
 
 		num = random.randint(1, 10)
-		if num > 2: num = 2	
+		if num > 2: num = 2
 		else: num = 4
 
 		x = random.randint(0, self.gridSize-1)
@@ -47,7 +47,7 @@ class GameLogic:
 	def Move(self, dir):
 		gridCopy = [row[:] for row in self.gridMatrix]
 
-		for i in range(dir): 
+		for i in range(dir):
 			self.gridMatrix = self.rotate(self.gridMatrix)
 
 		for i in range(self.gridSize):
@@ -56,7 +56,7 @@ class GameLogic:
 				if j != 0:
 				    temp.append(j)
 
-			temp += [0] * self.gridMatrix[i].count(0) 
+			temp += [0] * self.gridMatrix[i].count(0)
 			for j in range(len(temp) - 1):
 				if temp[j] == temp[j + 1] and temp[j] != 0 and temp[j + 1] != 0:
 					temp[j] = 2 * temp[j]
@@ -70,7 +70,7 @@ class GameLogic:
 
 			self.gridMatrix[i] += [0] * temp.count(0)
 
-		for i in range(4 - dir): 
+		for i in range(4 - dir):
 			self.gridMatrix = self.rotate(self.gridMatrix)
 
 		self.maxNumber = max(map(max, self.gridMatrix))
@@ -78,12 +78,12 @@ class GameLogic:
 		return self.gridMatrix != gridCopy
 
 	def PrintGrid(self):
-		print "\n"
+		print("\n")
 		for i in range(self.gridSize):
 			for j in range(self.gridSize):
-				print '{:4}'.format(self.gridMatrix[i][j]),
-			print
-		print "\nScore:" + str(self.score)
+				print('{:4}'.format(self.gridMatrix[i][j]), end='')
+			print("\n")
+		print("\nScore:" + str(self.score))
 
 	def CheckGameOver(self):
 		def inner(b):
@@ -96,3 +96,6 @@ class GameLogic:
 
 	def GetScore(self):
 		return self.score
+
+	def GetValueIn(self, i, j):
+		return self.gridMatrix[i][j]
