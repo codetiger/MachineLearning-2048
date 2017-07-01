@@ -2,6 +2,7 @@ from gamelogic import *
 import sys,tty,termios
 import random
 from tkinter import *
+from tkinter import messagebox
 
 KEY_UP_ALT = "\'\\uf700\'"
 KEY_DOWN_ALT = "\'\\uf701\'"
@@ -24,7 +25,6 @@ CELL_COLOR_DICT = { 2:"#776e65", 4:"#776e65", 8:"#f9f6f2", 16:"#f9f6f2", \
 FONT = ("Verdana", 40, "bold")
 
 SIZE = 500
-GRID_LEN = 4
 GRID_PADDING = 10
 
 class GameManager(Frame):
@@ -34,12 +34,13 @@ class GameManager(Frame):
 	highestNumber = 0
 	game = None
 	grid_cells = []
+	gridSize = 2
 
 	def __init__(self):
 		Frame.__init__(self)
 
 		self.grid()
-		self.game = GameLogic(4)
+		self.game = GameLogic(self.gridSize)
 		self.bestScore = 0
 		self.allTimeBestScore = 0
 		self.episodes = 1
@@ -47,7 +48,7 @@ class GameManager(Frame):
 
 		self.master.title('2048')
 		self.master.bind("<Key>", self.key_down)
-		self.master.resizable(0, 0)
+		self.master.resizable(width=False, height=False)
 		self.commands = {   KEY_UP: 3, KEY_DOWN: 1, KEY_LEFT: 4, KEY_RIGHT: 2,
 							KEY_UP_ALT: 3, KEY_DOWN_ALT: 1, KEY_LEFT_ALT: 4, KEY_RIGHT_ALT: 2 }
 		self.init_grid()
@@ -55,14 +56,13 @@ class GameManager(Frame):
 		self.mainloop()
 
 	def init_grid(self):
-		background = Frame(self, bg="#92877d", width=500, height=615)
-		gridFrame = Frame(background, bg="#BBADA1", width=456, height=456, padx=22, pady=22)
+		background = Frame(self, bg="#92877d", width=SIZE, height=SIZE)
+		background.grid()
 
-		gridFrame.grid()
-		for i in range(GRID_LEN):
+		for i in range(self.gridSize):
 		    grid_row = []
-		    for j in range(GRID_LEN):
-		        cell = Frame(gridFrame, bg=BACKGROUND_COLOR_CELL_EMPTY, width=SIZE/GRID_LEN, height=SIZE/GRID_LEN)
+		    for j in range(self.gridSize):
+		        cell = Frame(background, bg=BACKGROUND_COLOR_CELL_EMPTY, width=SIZE/self.gridSize, height=SIZE/self.gridSize)
 		        cell.grid(row=i, column=j, padx=GRID_PADDING, pady=GRID_PADDING)
 		        # font = Font(size=FONT_SIZE, family=FONT_FAMILY, weight=FONT_WEIGHT)
 		        t = Label(master=cell, text="", bg=BACKGROUND_COLOR_CELL_EMPTY, justify=CENTER, font=FONT, width=4, height=2)
@@ -72,8 +72,8 @@ class GameManager(Frame):
 		    self.grid_cells.append(grid_row)
 
 	def update_grid_cells(self):
-	    for i in range(GRID_LEN):
-	        for j in range(GRID_LEN):
+	    for i in range(self.gridSize):
+	        for j in range(self.gridSize):
 	            new_number = self.game.GetValueIn(i, j)
 	            if new_number == 0:
 	                self.grid_cells[i][j].configure(text="", bg=BACKGROUND_COLOR_CELL_EMPTY)
@@ -100,7 +100,9 @@ class GameManager(Frame):
 		if self.game.CheckGameOver():
 			file = open("bestscore.txt", "w")
 			file.write(str(self.allTimeBestScore))
-			print("\nBest Score: " + str(bestScore) + "\tAllTimeBest: " + str(allTimeBestScore) + "\tHigesh Number: " + str(highestNumber))
+			messagebox.showinfo("Game Over", "You lost the game! Try again...")
+			print("\nBest Score: " + str(self.bestScore) + "\tAllTimeBest: " + str(self.allTimeBestScore) + "\tHigesh Number: " + str(self.highestNumber))
+			self.master.destroy()
 
 	def getRandomAction(self):
 		if random.randint(0, 10) > 8:
