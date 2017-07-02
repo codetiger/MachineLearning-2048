@@ -2,18 +2,20 @@
 
 import random
 from copy import copy, deepcopy
+from datetime import datetime
 
 class GameLogic:
 	gridSize = 4
 	gridMatrix = []
 	score = 0
-	maxNumber = 0
 
 	def __init__(self, size):
 		self.gridSize = size
 		self.Reset()
 
 	def Reset(self):
+		random.seed(datetime.now())
+		# random.seed(0)
 		self.FillEmptyGrid()
 		self.AddNewNumber()
 		self.AddNewNumber()
@@ -30,8 +32,8 @@ class GameLogic:
 		if count < 1: return False
 
 		num = random.randint(1, 10)
-		if num > 2: num = 2
-		else: num = 4
+		if num > 2: num = 1
+		else: num = 2
 
 		x = random.randint(0, self.gridSize-1)
 		y = random.randint(0, self.gridSize-1)
@@ -48,6 +50,7 @@ class GameLogic:
 
 	def Move(self, dir):
 		gridCopy = [row[:] for row in self.gridMatrix]
+		moveScore = 0
 
 		for i in range(dir):
 			self.gridMatrix = self.rotate(self.gridMatrix)
@@ -61,8 +64,8 @@ class GameLogic:
 			temp += [0] * self.gridMatrix[i].count(0)
 			for j in range(len(temp) - 1):
 				if temp[j] == temp[j + 1] and temp[j] != 0 and temp[j + 1] != 0:
-					temp[j] = 2 * temp[j]
-					self.score += temp[j]
+					temp[j] = temp[j] + 1
+					moveScore = 2**temp[j]
 					temp[j + 1] = 0
 
 			self.gridMatrix[i] = []
@@ -75,15 +78,17 @@ class GameLogic:
 		for i in range(4 - dir):
 			self.gridMatrix = self.rotate(self.gridMatrix)
 
-		self.maxNumber = max(map(max, self.gridMatrix))
-
-		return self.gridMatrix != gridCopy
+		self.score += moveScore
+		return (moveScore, self.gridMatrix != gridCopy)
 
 	def PrintGrid(self):
 		print("\n")
 		for i in range(self.gridSize):
 			for j in range(self.gridSize):
-				print('{:4}'.format(self.gridMatrix[i][j]), end='')
+				num = 0
+				if self.gridMatrix[i][j]:
+					num = 2**self.gridMatrix[i][j]
+				print('{:4}'.format(num), end='')
 			print("\n")
 		print("\nScore:" + str(self.score))
 
@@ -99,8 +104,12 @@ class GameLogic:
 	def GetScore(self):
 		return self.score
 
+	def GetMaxNumber(self):
+		return max(map(max, self.gridMatrix))
+
 	def GetValueIn(self, i, j):
 		return self.gridMatrix[i][j]
 
 	def GetFlatGrid(self):
-		return [j for i in self.gridMatrix for j in i]
+		maxNumber = self.GetMaxNumber()
+		return [j/maxNumber for i in self.gridMatrix for j in i]
