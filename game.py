@@ -29,7 +29,7 @@ FONT = ("Verdana", 40, "bold")
 SIZE = 500
 GRID_PADDING = 10
 
-class GameManager(Frame):
+class GameEnvironment(Frame):
 	bestScore = 0
 	episodes = 1
 	highestNumber = 0
@@ -115,7 +115,7 @@ class GameManager(Frame):
 				self.highestNumber = self.game.maxNumber
 
 			messagebox.showinfo("Game Over", "You lost the game! Try again...")
-			print("\nBest Score: " + str(self.bestScore) + "\tHigesh Number: " + str(self.highestNumber))
+			# print "\nBest Score: " + str(self.bestScore) + "\tHigesh Number: " + str(self.highestNumber)
 			self.master.destroy()
 			return False
 
@@ -128,4 +128,4 @@ class GameManager(Frame):
 			dir = random.randint(1, 2)
 		return dir - 1
 
-gameMan = GameManager()
+	# def getGameState(self):

@@ -101,3 +101,6 @@ class GameLogic:
 
 	def GetValueIn(self, i, j):
 		return self.gridMatrix[i][j]
+
+	def GetFlatGrid(self):
+		return [j for i in self.gridMatrix for j in i]
