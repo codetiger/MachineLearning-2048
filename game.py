@@ -1,3 +1,5 @@
+#!/usr/bin/env python3 
+
 from gamelogic import *
 import sys,tty,termios
 import random
@@ -29,12 +31,11 @@ GRID_PADDING = 10
 
 class GameManager(Frame):
 	bestScore = 0
-	allTimeBestScore = 0
 	episodes = 1
 	highestNumber = 0
 	game = None
 	grid_cells = []
-	gridSize = 2
+	gridSize = 4
 
 	def __init__(self):
 		Frame.__init__(self)
@@ -42,17 +43,17 @@ class GameManager(Frame):
 		self.grid()
 		self.game = GameLogic(self.gridSize)
 		self.bestScore = 0
-		self.allTimeBestScore = 0
 		self.episodes = 1
 		self.highestNumber = 0
 
 		self.master.title('2048')
-		self.master.bind("<Key>", self.key_down)
+		# self.master.bind("<Key>", self.key_down)
 		self.master.resizable(width=False, height=False)
 		self.commands = {   KEY_UP: 3, KEY_DOWN: 1, KEY_LEFT: 4, KEY_RIGHT: 2,
 							KEY_UP_ALT: 3, KEY_DOWN_ALT: 1, KEY_LEFT_ALT: 4, KEY_RIGHT_ALT: 2 }
 		self.init_grid()
 		self.update_grid_cells()
+		self.gameLoop()
 		self.mainloop()
 
 	def init_grid(self):
@@ -86,50 +87,26 @@ class GameManager(Frame):
 			with open("bestscore.txt", "r") as file:
 				data = file.read()
 				if data:
-					self.allTimeBestScore = int(data)
+					self.bestScore = int(data)
 		except IOError:
-			self.allTimeBestScore = 0
+			self.bestScore = 0
 
 	def key_down(self, event):
 		dir = repr(event.char)
 		if dir in self.commands:
-			if self.game.Move(self.commands[dir]):
-				self.game.AddNewNumber()
+			self.updateMove(self.commands[dir])
+
+	def gameLoop(self):
+		while self.updateMove(self.getRandomAction()): pass
+
+	def updateMove(self, dir):
+		if self.game.Move(dir):
+			self.game.AddNewNumber()
 		self.update_grid_cells()
 
 		if self.game.CheckGameOver():
 			file = open("bestscore.txt", "w")
-			file.write(str(self.allTimeBestScore))
-			messagebox.showinfo("Game Over", "You lost the game! Try again...")
-			print("\nBest Score: " + str(self.bestScore) + "\tAllTimeBest: " + str(self.allTimeBestScore) + "\tHigesh Number: " + str(self.highestNumber))
-			self.master.destroy()
-
-	def getRandomAction(self):
-		if random.randint(0, 10) > 8:
-			dir = random.randint(3, 4)
-		else:
-			dir = random.randint(1, 2)
-		return dir
-
-	def gameMain(self):
-		print("\nWelcome to the 2048!")
-
-		for x in range(0, self.episodes):
-			self.game.Reset()
-
-			while not self.game.CheckGameOver():
-				dir = self.getHumanAction()
-				# dir = getRandomAction()
-				if dir == 0:
-					break
-
-				if self.game.Move(dir):
-					self.game.AddNewNumber()
-
-				self.game.PrintGrid()
-
-			if self.allTimeBestScore < self.game.score:
-				self.allTimeBestScore = self.game.score
+			file.write(str(self.bestScore))
 
 			if self.bestScore < self.game.score:
 				self.bestScore = self.game.score
@@ -137,9 +114,18 @@ class GameManager(Frame):
 			if self.highestNumber < self.game.maxNumber:
 				self.highestNumber = self.game.maxNumber
 
-		file = open("bestscore.txt", "w")
-		file.write(str(self.allTimeBestScore))
+			messagebox.showinfo("Game Over", "You lost the game! Try again...")
+			print("\nBest Score: " + str(self.bestScore) + "\tHigesh Number: " + str(self.highestNumber))
+			self.master.destroy()
+			return False
 
-		print("\nBest Score: " + str(bestScore) + "\tAllTimeBest: " + str(allTimeBestScore) + "\tHigesh Number: " + str(highestNumber))
+		return True
+
+	def getRandomAction(self):
+		if random.randint(0, 10) > 8:
+			dir = random.randint(3, 4)
+		else:
+			dir = random.randint(1, 2)
+		return dir - 1
 
 gameMan = GameManager()

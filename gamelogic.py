@@ -1,3 +1,5 @@
+#!/usr/bin/env python3 
+
 import random
 from copy import copy, deepcopy
 
