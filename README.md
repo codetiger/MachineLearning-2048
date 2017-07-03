@@ -5,6 +5,10 @@ AI player for 2048 game using Machine Learning concepts
 ```
 pip install -r requirements.txt
 ```
+### Progress
+The leanring progress is very poor.
+<p align="center"><img src="2048_ddqn.png"></p>
+
 ### References
 1. Double DQN code reference: https://github.com/rlcode/reinforcement-learning
 2. Reinforcement Learning Basics: https://www.youtube.com/watch?v=2pWv7GOvuf0
