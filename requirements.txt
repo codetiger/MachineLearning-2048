@@ -2,3 +2,4 @@ numpy
 keras
 gym
 tensorflow
+matplotlib
