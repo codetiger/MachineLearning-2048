@@ -41,7 +41,7 @@ class DoubleDQNAgent:
         self.update_target_model()
 
         if self.load_model:
-            self.model.load_weights("./save_model/cartpole_ddqn.h5")
+            self.model.load_weights("2048.h5")
 
     # approximate Q function using Neural Network
     # state is input and Q Value of each action is output of network

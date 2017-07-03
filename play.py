@@ -9,7 +9,7 @@ import gym
 import numpy as np
 import pylab
 
-EPISODES = 250
+EPISODES = 100
 
 def getPeaks(arr):
     peaks = []
@@ -64,9 +64,6 @@ if __name__ == "__main__":
 
             prevMaxNumber = 0
 
-            if isValid:
-                gameEnv.AddNewNumber()
-
             # Lenth of game award
             reward = 10.0
 
@@ -83,6 +80,11 @@ if __name__ == "__main__":
             if gameEnv.GetMaxNumber() > prevMaxNumber:
                 reward += 10.0
                 prevMaxNumber = gameEnv.GetMaxNumber()
+
+            if isValid:
+                gameEnv.AddNewNumber()
+            else:
+                reward = -50.0
 
             done = gameEnv.CheckGameOver()
             if done:
@@ -102,5 +104,9 @@ if __name__ == "__main__":
                 pylab.plot(episodes, scores, 'b')
                 pylab.savefig("2048_ddqn.png")
 
-                print("episode: {}/{}, score: {}, MaxNumber: {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), agent.epsilon))
+                print("episode: {}/{}, score: {}, MaxNumber: {}, memory length: {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
                 break
+        
+        # save the model
+        if e % 50 == 0:
+            agent.model.save_weights("2048.h5")
