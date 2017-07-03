@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import random
 import gym
 import numpy as np
@@ -6,23 +5,18 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
-from keras import backend as K
 
-
-
-# Double DQN Agent for the Cartpole
-# it uses Neural Network to approximate q function
-# and replay memory & target q network
-class DoubleDQNAgent:
+class DQNAgent:
     def __init__(self, state_size, action_size):
         # if you want to see Cartpole learning, then change to True
         self.render = False
         self.load_model = False
+
         # get size of state and action
         self.state_size = state_size
         self.action_size = action_size
 
-        # these is hyper parameters for the Double DQN
+        # These are hyper parameters for the DQN
         self.discount_factor = 0.99
         self.learning_rate = 0.001
         self.epsilon = 1.0
@@ -41,7 +35,7 @@ class DoubleDQNAgent:
         self.update_target_model()
 
         if self.load_model:
-            self.model.load_weights("./save_model/cartpole_ddqn.h5")
+            self.model.load_weights("./save_model/cartpole_dqn.h5")
 
     # approximate Q function using Neural Network
     # state is input and Q Value of each action is output of network
@@ -86,7 +80,7 @@ class DoubleDQNAgent:
         update_target = np.zeros((batch_size, self.state_size))
         action, reward, done = [], [], []
 
-        for i in range(batch_size):
+        for i in range(self.batch_size):
             update_input[i] = mini_batch[i][0]
             action.append(mini_batch[i][1])
             reward.append(mini_batch[i][2])
@@ -94,22 +88,16 @@ class DoubleDQNAgent:
             done.append(mini_batch[i][4])
 
         target = self.model.predict(update_input)
-        target_next = self.model.predict(update_target)
         target_val = self.target_model.predict(update_target)
 
         for i in range(self.batch_size):
-            # like Q Learning, get maximum Q value at s'
-            # But from target model
+            # Q Learning: get maximum Q value at s' from target model
             if done[i]:
                 target[i][action[i]] = reward[i]
             else:
-                # the key point of Double DQN
-                # selection of action is from model
-                # update is from target model
-                a = np.argmax(target_next[i])
                 target[i][action[i]] = reward[i] + self.discount_factor * (
-                    target_val[i][a])
+                    np.amax(target_val[i]))
 
-        # make minibatch which includes target q value and predicted q value
         # and do the model fit!
-        self.model.fit(update_input, target, batch_size=self.batch_size, epochs=1, verbose=0)
+        self.model.fit(update_input, target, batch_size=self.batch_size,
+                       epochs=1, verbose=0)

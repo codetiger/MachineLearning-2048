@@ -14,8 +14,8 @@ class GameLogic:
 		self.Reset()
 
 	def Reset(self):
-		random.seed(datetime.now())
-		# random.seed(0)
+		# random.seed(datetime.now())
+		random.seed(0)
 		self.FillEmptyGrid()
 		self.AddNewNumber()
 		self.AddNewNumber()
@@ -110,6 +110,10 @@ class GameLogic:
 	def GetValueIn(self, i, j):
 		return self.gridMatrix[i][j]
 
+	def GetMatrix(self):
+		return self.gridMatrix
+
 	def GetFlatGrid(self):
-		maxNumber = self.GetMaxNumber()
-		return [j/maxNumber for i in self.gridMatrix for j in i]
+		return [j for i in self.gridMatrix for j in i]
+		# maxNumber = self.GetMaxNumber()
+		# return [j/maxNumber for i in self.gridMatrix for j in i]

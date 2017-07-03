@@ -1,13 +1,36 @@
 from gamelogic import *
-from ddqn import DQNAgent
+from ddqn import DoubleDQNAgent
+
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 from keras import backend as K
 import gym
 import numpy as np
+import pylab
 
-EPISODES = 10000
+EPISODES = 250
+
+def getPeaks(arr):
+    peaks = []
+    for i in range(len(arr)):
+        for j in range(len(arr[i])):
+            if checkPeak(arr, i, j):
+                peaks.append((i, j))
+    return peaks
+
+def checkPeak(arr, i, j):
+    if arr[i][j] == 0:
+        return False
+
+    cells = [(i+1, j+0), (i+0, j+1), (i-1, j+0), (i+0, j-1)]
+    greaterCells = 0
+    for n in range(len(cells)):
+        (x, y) = cells[n]
+        if x >= 0 and x < len(arr) and y >= 0 and y < len(arr[x]) and arr[x][y] >= arr[i][j]:
+            greaterCells += 1
+
+    return greaterCells == 0
 
 if __name__ == "__main__":
     gridSize = 4
@@ -15,7 +38,7 @@ if __name__ == "__main__":
 
     state_size = gridSize * gridSize
     action_size = 4
-    agent = DQNAgent(state_size, action_size)
+    agent = DoubleDQNAgent(state_size, action_size)
 
     # try:
     #     agent.load("2048.h5")
@@ -23,18 +46,8 @@ if __name__ == "__main__":
     #     pass
 
     done = False
-    batch_size = 64
-    bestScore = 0
-
-    try:
-        with open("bestscore.txt", "r") as file:
-            data = file.read()
-            if data:
-                bestScore = int(data)
-    except IOError:
-        bestScore = 0
-
-
+    scores, episodes = [], []
+    
     for e in range(EPISODES):
         gameEnv.Reset()
         state = gameEnv.GetFlatGrid()
@@ -43,34 +56,51 @@ if __name__ == "__main__":
 
         while True:
             # gameEnv.PrintGrid()
-            action = agent.act(state)
+            action = agent.get_action(state)
             (moveScore, isValid) = gameEnv.Move(action + 1)
 
             next_state = gameEnv.GetFlatGrid()
             next_state = np.reshape(next_state, [1, state_size])
 
             prevMaxNumber = 0
-            reward = -1.0
 
             if isValid:
                 gameEnv.AddNewNumber()
 
-            if moveScore:
-                reward = moveScore / 2**10
+            # Lenth of game award
+            reward = 10.0
+
+            # Rewards for single peak
+            mat = gameEnv.GetMatrix()
+            peaks = getPeaks(mat)
+            if len(peaks) == 1:
+                reward += 10.0
+    
+            # Reward for step score
+            reward += moveScore
+
+            # Reward for New Max Number
+            if gameEnv.GetMaxNumber() > prevMaxNumber:
+                reward += 10.0
+                prevMaxNumber = gameEnv.GetMaxNumber()
 
             done = gameEnv.CheckGameOver()
             if done:
-                reward = -1.0
+                reward = -100.0
 
-            agent.remember(state, action, reward, next_state, done)
+            agent.append_sample(state, action, reward, next_state, done)
+            agent.train_model()
             state = next_state
+
             if done:
-                gameEnv.PrintGrid()
+                # gameEnv.PrintGrid()
                 agent.update_target_model()
+
+                scores.append(gameEnv.GetScore())
+                episodes.append(e)
+
+                pylab.plot(episodes, scores, 'b')
+                pylab.savefig("2048_ddqn.png")
+
                 print("episode: {}/{}, score: {}, MaxNumber: {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), agent.epsilon))
                 break
-
-        if len(agent.memory) > batch_size:
-            agent.replay(batch_size)
-        # if e % 10 == 0:
-        #     agent.save("2048.h5")
