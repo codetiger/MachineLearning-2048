@@ -3,6 +3,7 @@
 import random
 from copy import copy, deepcopy
 from datetime import datetime
+import numpy as np
 
 class GameLogic:
 	gridSize = 4
@@ -114,6 +115,7 @@ class GameLogic:
 		return self.gridMatrix
 
 	def GetFlatGrid(self):
-		return [j for i in self.gridMatrix for j in i]
 		# maxNumber = self.GetMaxNumber()
-		# return [j/maxNumber for i in self.gridMatrix for j in i]
+		# flatMat = [j/maxNumber for i in self.gridMatrix for j in i]
+		flatMat = [j for i in self.gridMatrix for j in i]
+		return np.array(tuple(flatMat))
