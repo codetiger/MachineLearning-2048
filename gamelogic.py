@@ -14,8 +14,8 @@ class GameLogic:
 		self.Reset()
 
 	def Reset(self):
-		# random.seed(datetime.now())
-		random.seed(0)
+		random.seed(datetime.now())
+		# random.seed(0)
 		self.FillEmptyGrid()
 		self.AddNewNumber()
 		self.AddNewNumber()

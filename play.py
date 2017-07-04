@@ -9,7 +9,7 @@ import gym
 import numpy as np
 import pylab
 
-EPISODES = 100
+EPISODES = 1000
 
 def getPeaks(arr):
     peaks = []
@@ -33,17 +33,17 @@ def checkPeak(arr, i, j):
     return greaterCells == 0
 
 if __name__ == "__main__":
-    gridSize = 4
+    gridSize = 2
     gameEnv = GameLogic(gridSize)
 
     state_size = gridSize * gridSize
     action_size = 4
     agent = DoubleDQNAgent(state_size, action_size)
 
-    # try:
-    #     agent.load("2048.h5")
-    # except IOError:
-    #     pass
+    try:
+        agent.model.save_weights("2048_"+str(gridSize)+".h5")
+    except IOError:
+        pass
 
     done = False
     scores, episodes = [], []
@@ -53,6 +53,7 @@ if __name__ == "__main__":
         state = gameEnv.GetFlatGrid()
         state = np.reshape(state, [1, state_size])
         reward = 0.0
+        prevMaxNumber = 0
 
         while True:
             # gameEnv.PrintGrid()
@@ -62,26 +63,24 @@ if __name__ == "__main__":
             next_state = gameEnv.GetFlatGrid()
             next_state = np.reshape(next_state, [1, state_size])
 
-            prevMaxNumber = 0
-
-            # Lenth of game award
-            reward = 10.0
-
-            # Rewards for single peak
-            mat = gameEnv.GetMatrix()
-            peaks = getPeaks(mat)
-            if len(peaks) == 1:
-                reward += 10.0
-    
-            # Reward for step score
-            reward += moveScore
-
-            # Reward for New Max Number
-            if gameEnv.GetMaxNumber() > prevMaxNumber:
-                reward += 10.0
-                prevMaxNumber = gameEnv.GetMaxNumber()
-
             if isValid:
+                # Lenth of game award
+                reward = 10.0
+
+                # # Rewards for single peak
+                # mat = gameEnv.GetMatrix()
+                # peaks = getPeaks(mat)
+                # if len(peaks) == 1:
+                #     reward += 10.0
+        
+                # Reward for step score
+                reward += moveScore
+
+                # Reward for New Max Number
+                if gameEnv.GetMaxNumber() > prevMaxNumber:
+                    reward += 10.0
+                    prevMaxNumber = gameEnv.GetMaxNumber()
+
                 gameEnv.AddNewNumber()
             else:
                 reward = -50.0
@@ -109,4 +108,4 @@ if __name__ == "__main__":
         
         # save the model
         if e % 50 == 0:
-            agent.model.save_weights("2048.h5")
+            agent.model.save_weights("2048_"+str(gridSize)+".h5")
