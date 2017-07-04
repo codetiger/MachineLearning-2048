@@ -1,5 +1,8 @@
 from gamelogic import *
 from ddqn import DoubleDQNAgent
+# from dqn import DQNAgent
+# from ql import QLearningAgent
+# from rl import REINFORCEAgent
 
 from keras.models import Sequential
 from keras.layers import Dense
@@ -38,12 +41,15 @@ if __name__ == "__main__":
 
     state_size = gridSize * gridSize
     action_size = 4
+
     agent = DoubleDQNAgent(state_size, action_size)
 
-    try:
-        agent.model.save_weights("2048_"+str(gridSize)+".h5")
-    except IOError:
-        pass
+    # agent = DoubleDQNAgent(state_size, action_size)
+
+    # try:
+    #     agent.model.save_weights("2048_"+str(gridSize)+".h5")
+    # except IOError:
+    #     pass
 
     done = False
     scores, episodes = [], []
@@ -57,7 +63,10 @@ if __name__ == "__main__":
 
         while True:
             # gameEnv.PrintGrid()
+
             action = agent.get_action(state)
+
+            # action = agent.get_action(state)
             (moveScore, isValid) = gameEnv.Move(action + 1)
 
             next_state = gameEnv.GetFlatGrid()
@@ -65,13 +74,13 @@ if __name__ == "__main__":
 
             if isValid:
                 # Lenth of game award
-                reward = 10.0
+                # reward = 10.0
 
                 # # Rewards for single peak
-                # mat = gameEnv.GetMatrix()
-                # peaks = getPeaks(mat)
-                # if len(peaks) == 1:
-                #     reward += 10.0
+                mat = gameEnv.GetMatrix()
+                peaks = getPeaks(mat)
+                if len(peaks) == 1:
+                    reward += 10.0
         
                 # Reward for step score
                 reward += moveScore
@@ -90,6 +99,7 @@ if __name__ == "__main__":
                 reward = -100.0
 
             agent.append_sample(state, action, reward, next_state, done)
+            # agent.learn(str(state), action, reward, str(next_state))
             agent.train_model()
             state = next_state
 
@@ -103,9 +113,13 @@ if __name__ == "__main__":
                 pylab.plot(episodes, scores, 'b')
                 pylab.savefig("2048_ddqn.png")
 
-                print("episode: {}/{}, score: {}, MaxNumber: {}, memory length: {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
+                # print("episode: {}/{}, score: {}, MaxNumber: {}, memory length: {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
+                print("episode: {}/{}, score: {}, MaxNumber: {}, MemSize {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
                 break
         
-        # save the model
-        if e % 50 == 0:
-            agent.model.save_weights("2048_"+str(gridSize)+".h5")
+        # # save the model
+        # if e % 50 == 0:
+        #     agent.model.save_weights("2048_"+str(gridSize)+".h5")
+
+
+
