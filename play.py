@@ -12,7 +12,7 @@ import gym
 import numpy as np
 import pylab
 
-EPISODES = 1000
+EPISODES = 10
 
 def getPeaks(arr):
     peaks = []
@@ -36,7 +36,7 @@ def checkPeak(arr, i, j):
     return greaterCells == 0
 
 if __name__ == "__main__":
-    gridSize = 2
+    gridSize = 4
     gameEnv = GameLogic(gridSize)
 
     state_size = gridSize * gridSize
@@ -46,10 +46,10 @@ if __name__ == "__main__":
 
     # agent = DoubleDQNAgent(state_size, action_size)
 
-    # try:
-    #     agent.model.save_weights("2048_"+str(gridSize)+".h5")
-    # except IOError:
-    #     pass
+    try:
+        agent.model.load_weights("2048_"+str(gridSize)+".h5")
+    except IOError:
+        pass
 
     done = False
     scores, episodes = [], []
@@ -77,10 +77,10 @@ if __name__ == "__main__":
                 # reward = 10.0
 
                 # # Rewards for single peak
-                mat = gameEnv.GetMatrix()
-                peaks = getPeaks(mat)
-                if len(peaks) == 1:
-                    reward += 10.0
+                # mat = gameEnv.GetMatrix()
+                # peaks = getPeaks(mat)
+                # if len(peaks) == 1:
+                #     reward += 10.0
         
                 # Reward for step score
                 reward += moveScore
@@ -117,9 +117,9 @@ if __name__ == "__main__":
                 print("episode: {}/{}, score: {}, MaxNumber: {}, MemSize {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
                 break
         
-        # # save the model
-        # if e % 50 == 0:
-        #     agent.model.save_weights("2048_"+str(gridSize)+".h5")
+        # save the model
+        if e % 50 == 0:
+            agent.model.save_weights("2048_"+str(gridSize)+".h5")
 
 
 
