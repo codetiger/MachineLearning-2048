@@ -12,7 +12,7 @@ import gym
 import numpy as np
 import pylab
 
-EPISODES = 10
+EPISODES = 1000
 
 def getPeaks(arr):
     peaks = []
@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     done = False
     scores, episodes = [], []
-    
+
     for e in range(EPISODES):
         gameEnv.Reset()
         state = gameEnv.GetFlatGrid()
@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 # peaks = getPeaks(mat)
                 # if len(peaks) == 1:
                 #     reward += 10.0
-        
+
                 # Reward for step score
                 reward += moveScore
 
@@ -116,10 +116,7 @@ if __name__ == "__main__":
                 # print("episode: {}/{}, score: {}, MaxNumber: {}, memory length: {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
                 print("episode: {}/{}, score: {}, MaxNumber: {}, MemSize {}, e: {:.2}".format(e, EPISODES, gameEnv.GetScore(), 2**gameEnv.GetMaxNumber(), len(agent.memory), agent.epsilon))
                 break
-        
+
         # save the model
         if e % 50 == 0:
             agent.model.save_weights("2048_"+str(gridSize)+".h5")
-
-
-
