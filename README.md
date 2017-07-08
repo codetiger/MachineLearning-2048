@@ -7,7 +7,6 @@ pip install -r requirements.txt
 ```
 ### Progress
 The leanring progress is very poor.
-<p align="center"><img src="2048_ddqn.png"></p>
 
 ### References
 1. Double DQN code reference: https://github.com/rlcode/reinforcement-learning
