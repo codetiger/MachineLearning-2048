@@ -5,8 +5,10 @@ AI player for 2048 game using Machine Learning concepts
 ```
 pip install -r requirements.txt
 ```
-### Progress
-The leanring progress is very poor.
+### Conclusion
+After training the agent for 100K episodes, the agent was able to choose the most optimal move everytime. I didn't try the same for 4x4 settings as it is going to take days to get the same output. 
+
+The Test still gets into infinite loop in some games. Meaning the agent needs still more training. 
 
 ### References
 1. Double DQN code reference: https://github.com/rlcode/reinforcement-learning

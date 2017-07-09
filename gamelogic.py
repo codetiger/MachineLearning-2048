@@ -2,6 +2,7 @@ import random
 from copy import copy, deepcopy
 from datetime import datetime
 import numpy as np
+import time
 
 class GameLogic:
 	_gridSize = 4
@@ -11,20 +12,22 @@ class GameLogic:
 	_normalize = False
 	_bestScore = 0
 	_invalidMoveCounter = 0
+	_reset2RandomBoard = False
 
-	def __init__(self, size = 4, random_seed = 0):
+	def __init__(self, size = 4):
 		self._gridSize = size
-		self.reset(random_seed=random_seed)
+		self.reset()
 
-	def reset(self, random_seed=0):
+	def reset(self):
 		self._score = 0
 		self._invalidMoveCounter = 0
-		random.seed(random_seed)
-		np.random.seed(random_seed)
 
-		self._fillEmptyGrid()
-		self._addNewNumber()
-		self._addNewNumber()
+		if self._reset2RandomBoard:
+			self._generateRandomBoard()
+		else:
+			self._fillEmptyGrid()
+			self._addNewNumber()
+			self._addNewNumber()
 
 		return self._getState()
 
@@ -64,10 +67,8 @@ class GameLogic:
 		if self._bestScore < self._score:
 			self._bestScore = self._score
 
-		state = self._getState()	
-
 		if self._gridMatrix == gridCopy:
-			self._invalidMoveCounter += 1
+			self._invalidMoveCounter = self._invalidMoveCounter + 1
 			moveScore = self._invalidMoveCounter * -1
 		else:
 			self._invalidMoveCounter = 0
@@ -75,8 +76,8 @@ class GameLogic:
 
 		done = self._checkGameOver()
 
-		if self._render:
-			print("Dir: " + str(dir))
+		if self._render and done:
+			# print("Dir: " + str(dir))
 			self._printGrid()
 
 		if done:
@@ -84,6 +85,8 @@ class GameLogic:
 
 		if moveScore > 0 and self._checkOptimInAllDir(self._gridMatrix):
 			moveScore = 10
+
+		state = self._getState()	
 
 		# if self._normalize:
 		# 	if moveScore > 0:
@@ -119,9 +122,9 @@ class GameLogic:
 		return list(map(list, zip(*grid[::-1])))
 
 	def _printGrid(self):
-		print("\n")
-		self._printMatrix(self._gridMatrix)
-		print("\nScore:" + str(self._score))
+		# print("\n")
+		# self._printMatrix(self._gridMatrix)
+		print("\nScore: " + str(self._score) + " MaxTile: " + str(2**self._getMaxNumber()))
 
 	def _printMatrix(self, matrix):
 		for i in range(self._gridSize):
@@ -184,3 +187,12 @@ class GameLogic:
 			return True
 		else:
 			return False
+
+	def _generateRandomBoard(self):
+		self._fillEmptyGrid()
+		numRandTiles = random.randint(2, self._gridSize*self._gridSize)
+
+		for n in range(numRandTiles):
+			x = random.randint(0, self._gridSize-1)
+			y = random.randint(0, self._gridSize-1)
+			self._gridMatrix[x][y] = random.randint(0, self._gridSize - 1)

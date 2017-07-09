@@ -11,6 +11,7 @@ from rl.memory import SequentialMemory
 
 from gamelogic import *
 from datetime import datetime
+import numpy, time
 
 ENV_NAME = "2048"
 
@@ -18,9 +19,13 @@ if __name__ == "__main__":
 	# Get the environment and extract the number of actions.
 	gridSize = 2
 
+	random.seed(int(time.time()))
+	np.random.seed(int(time.time()))
+
 	env = GameLogic(size = gridSize)
 	env._normalize = True
-	env.reset(random_seed=0)
+	# env._reset2RandomBoard = True
+	env.reset()
 
 	nb_actions = 4
 	nb_steps = int(2e6)
@@ -50,23 +55,23 @@ if __name__ == "__main__":
 	# even the metrics!
 	memory = SequentialMemory(limit=memory_size, window_length=window_length)
 
-	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., value_min=.1, value_test=.05, nb_steps=1000000)
+	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., value_min=.1, value_test=.05, nb_steps=10000)
 
 	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=5000, gamma=.99, target_model_update=10000, train_interval=4, delta_clip=1.)
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 
-	dqn.load_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME))
+	dqn.load_weights('duel_dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize))
 
 	# Okay, now it's time to learn something! We visualize the training here for show, but this
 	# slows down training quite a lot. You can always safely abort the training prematurely using
 	# Ctrl + C.
-	dqn.fit(env, nb_steps=999999, visualize=False, verbose=1)
+	dqn.fit(env, nb_steps=99999, visualize=False, verbose=1)
 
 	# After training is done, we save the final weights.
-	dqn.save_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
+	dqn.save_weights('duel_dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize), overwrite=True)
 
 	env._render= True
-	env.reset(random_seed=0)
+	env.reset()
 	# Finally, evaluate our algorithm for 5 episodes.
 	dqn.test(env, nb_episodes=5, visualize=False)
