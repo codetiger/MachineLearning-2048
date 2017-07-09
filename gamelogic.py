@@ -12,14 +12,15 @@ class GameLogic:
 	_bestScore = 0
 	_invalidMoveCounter = 0
 
-	def __init__(self, size = 4, random_seed = datetime.now()):
+	def __init__(self, size = 4, random_seed = 0):
 		self._gridSize = size
 		self.reset(random_seed=random_seed)
 
-	def reset(self, random_seed=datetime.now()):
+	def reset(self, random_seed=0):
 		self._score = 0
 		self._invalidMoveCounter = 0
-		random.seed(datetime.now())
+		random.seed(random_seed)
+		np.random.seed(random_seed)
 
 		self._fillEmptyGrid()
 		self._addNewNumber()
@@ -63,15 +64,14 @@ class GameLogic:
 		if self._bestScore < self._score:
 			self._bestScore = self._score
 
+		state = self._getState()	
+
 		if self._gridMatrix == gridCopy:
 			self._invalidMoveCounter += 1
+			moveScore = self._invalidMoveCounter * -1
 		else:
 			self._invalidMoveCounter = 0
-
-		if self._invalidMoveCounter > 0:
-			moveScore = self._invalidMoveCounter * -1
-
-		self._addNewNumber()
+			self._addNewNumber()
 
 		done = self._checkGameOver()
 
@@ -80,13 +80,16 @@ class GameLogic:
 			self._printGrid()
 
 		if done:
-			moveScore = 0
+			moveScore = -100
 
-		if self._normalize:
-			if moveScore > 0:
-				moveScore = np.log2(moveScore)
+		if moveScore > 0 and self._checkOptimInAllDir(self._gridMatrix):
+			moveScore = 10
 
-		return self._getState(), moveScore, done, {}
+		# if self._normalize:
+		# 	if moveScore > 0:
+		# 		moveScore = np.log2(moveScore)
+
+		return state, moveScore, done, {}
 
 	def _fillEmptyGrid(self):
 		self._gridMatrix = [[0 for col in range(self._gridSize)] for row in range(self._gridSize)]
@@ -117,14 +120,17 @@ class GameLogic:
 
 	def _printGrid(self):
 		print("\n")
+		self._printMatrix(self._gridMatrix)
+		print("\nScore:" + str(self._score))
+
+	def _printMatrix(self, matrix):
 		for i in range(self._gridSize):
 			for j in range(self._gridSize):
 				num = 0
-				if self._gridMatrix[i][j]:
-					num = 2**self._gridMatrix[i][j]
+				if matrix[i][j]:
+					num = 2**matrix[i][j]
 				print('{:4}'.format(num), end='')
 			print("\n")
-		print("\nScore:" + str(self._score))
 
 	def _checkGameOver(self):
 		def inner(b):
@@ -146,3 +152,35 @@ class GameLogic:
 
 		flatMat = [j/maxNumber for i in self._gridMatrix for j in i]
 		return tuple(flatMat)
+
+	def _checkOptimInAllDir(self, matrix):
+		gridCopy = [row[:] for row in matrix]
+
+		for i in range(4):  #Check through all directions
+			gridCopy = self._rotate(gridCopy)
+			for j in range(2):  #Check through both mirrors
+				gridCopy = gridCopy[::-1]
+				if self._checkOptimInMatrix(gridCopy):
+					return True
+
+		return False
+
+	def _checkOptimInMatrix(self, matrix):
+		reverseRow = True
+		newFlatMat = [] # builds a 1d list in zipzag order
+		for row in matrix:
+			reverseRow = not reverseRow
+			newRow = row
+			if reverseRow:
+				newRow = reversed(row)
+			for val in newRow:
+				newFlatMat = newFlatMat + [val]
+
+		newFlatMat = [x for x in newFlatMat if x != 0] # removes 0s from the list
+
+		if all(earlier >= later for earlier, later in zip(newFlatMat, newFlatMat[1:])):
+			return True
+		elif all(earlier <= later for earlier, later in zip(newFlatMat, newFlatMat[1:])):
+			return True
+		else:
+			return False

@@ -56,15 +56,8 @@ if __name__ == "__main__":
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 
+
 	dqn.load_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME))
-
-	# Okay, now it's time to learn something! We visualize the training here for show, but this
-	# slows down training quite a lot. You can always safely abort the training prematurely using
-	# Ctrl + C.
-	dqn.fit(env, nb_steps=999999, visualize=False, verbose=1)
-
-	# After training is done, we save the final weights.
-	dqn.save_weights('duel_dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
 
 	env._render= True
 	env.reset(random_seed=0)
