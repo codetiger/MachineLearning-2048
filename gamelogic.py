@@ -76,8 +76,8 @@ class GameLogic:
 
 		done = self._checkGameOver()
 
-		if self._render and done:
-			# print("Dir: " + str(dir))
+		if self._render:
+			print("Dir: " + str(dir))
 			self._printGrid()
 
 		if done:
