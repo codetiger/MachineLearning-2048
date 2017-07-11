@@ -67,7 +67,7 @@ if __name__ == "__main__":
 	# even the metrics!
 	memory = SequentialMemory(limit=memory_size, window_length=window_length)
 
-	policy = EpsGreedyQPolicy(eps=.05)
+	policy = EpsGreedyQPolicy(eps=.01)
 
 	dqn = DQNAgent(model=model, nb_actions=nb_actions, test_policy=policy, policy=policy, memory=memory)
 	
