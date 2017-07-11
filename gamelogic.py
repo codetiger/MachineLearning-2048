@@ -8,7 +8,7 @@ class GameLogic:
 	_gridSize = 4
 	_gridMatrix = []
 	_score = 0
-	_render = False
+	_verbose = 0
 	_normalize = False
 	_bestScore = 0
 	_invalidMoveCounter = 0
@@ -76,8 +76,12 @@ class GameLogic:
 
 		done = self._checkGameOver()
 
-		if self._render:
+		if self._verbose >= 2:
 			self._printGrid()
+		
+		if self._verbose >= 1 and done:
+			self._printGrid()
+			print("Score: " + str(self._score) + " MaxTile: " + str(2**self._getMaxNumber()))
 
 		if done:
 			moveScore = -100
@@ -121,9 +125,7 @@ class GameLogic:
 		return list(map(list, zip(*grid[::-1])))
 
 	def _printGrid(self):
-		# print("\n")
 		self._printMatrix(self._gridMatrix)
-		print("Score: " + str(self._score) + " MaxTile: " + str(2**self._getMaxNumber()))
 
 	def _printMatrix(self, matrix):
 		for i in range(self._gridSize):
@@ -132,7 +134,7 @@ class GameLogic:
 				if matrix[i][j]:
 					num = 2**matrix[i][j]
 				print('{:4}'.format(num), end='')
-			print("\n")
+			print("")
 
 	def _checkGameOver(self):
 		def inner(b):

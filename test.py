@@ -8,12 +8,24 @@ from keras.optimizers import Adam
 from rl.agents.dqn import DQNAgent
 from rl.policy import EpsGreedyQPolicy, BoltzmannQPolicy, LinearAnnealedPolicy
 from rl.memory import SequentialMemory
+from rl.callbacks import Callback
 
 from gamelogic import *
 from datetime import datetime
 import numpy, time
+import csv
 
 ENV_NAME = "2048"
+
+class LivePlotCallback(Callback):
+	def __init__(self, env, filePath):
+		self._env = env
+		_csvFile = open(filePath, "w")
+		self._csvWriter = csv.writer(_csvFile, delimiter=',')
+
+	def on_episode_end(self, episode, logs):
+		self._csvWriter.writerow((episode, self._env._score, 2**self._env._getMaxNumber()))
+
 
 if __name__ == "__main__":
 	# Get the environment and extract the number of actions.
@@ -57,13 +69,15 @@ if __name__ == "__main__":
 
 	policy = EpsGreedyQPolicy(eps=.05)
 
-	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory)
+	dqn = DQNAgent(model=model, nb_actions=nb_actions, test_policy=policy, policy=policy, memory=memory)
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 
 	dqn.load_weights('duel_dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize))
 
-	env._render= True
+	cbs = [LivePlotCallback(env=env, filePath='duel_dqn_{}_test_{}x.csv'.format(ENV_NAME, gridSize))]
+
+	env._verbose = 1
 	env.reset()
 	# Finally, evaluate our algorithm for 5 episodes.
-	dqn.test(env, nb_episodes=100, visualize=False)
+	dqn.test(env, nb_episodes=100, visualize=False, verbose=1, callbacks=cbs)
