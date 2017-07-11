@@ -55,9 +55,9 @@ if __name__ == "__main__":
 	# even the metrics!
 	memory = SequentialMemory(limit=memory_size, window_length=window_length)
 
-	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1., value_min=.1, value_test=.05, nb_steps=10000)
+	policy = EpsGreedyQPolicy(eps=.05)
 
-	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=5000, gamma=.99, target_model_update=10000, train_interval=4, delta_clip=1.)
+	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory)
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 

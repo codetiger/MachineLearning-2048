@@ -77,7 +77,6 @@ class GameLogic:
 		done = self._checkGameOver()
 
 		if self._render:
-			print("Dir: " + str(dir))
 			self._printGrid()
 
 		if done:
@@ -123,8 +122,8 @@ class GameLogic:
 
 	def _printGrid(self):
 		# print("\n")
-		# self._printMatrix(self._gridMatrix)
-		print("\nScore: " + str(self._score) + " MaxTile: " + str(2**self._getMaxNumber()))
+		self._printMatrix(self._gridMatrix)
+		print("Score: " + str(self._score) + " MaxTile: " + str(2**self._getMaxNumber()))
 
 	def _printMatrix(self, matrix):
 		for i in range(self._gridSize):
