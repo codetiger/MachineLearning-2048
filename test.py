@@ -29,7 +29,7 @@ class LivePlotCallback(Callback):
 
 if __name__ == "__main__":
 	# Get the environment and extract the number of actions.
-	gridSize = 3
+	gridSize = 4
 
 	random.seed(int(time.time()))
 	np.random.seed(int(time.time()))
@@ -73,9 +73,9 @@ if __name__ == "__main__":
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 
-	dqn.load_weights('duel_dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize))
+	dqn.load_weights('dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize))
 
-	cbs = [LivePlotCallback(env=env, filePath='duel_dqn_{}_test_{}x.csv'.format(ENV_NAME, gridSize))]
+	cbs = [LivePlotCallback(env=env, filePath='dqn_{}_test_{}x.csv'.format(ENV_NAME, gridSize))]
 
 	env._verbose = 1
 	env.reset()
