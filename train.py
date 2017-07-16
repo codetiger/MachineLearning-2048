@@ -17,7 +17,7 @@ ENV_NAME = "2048"
 
 if __name__ == "__main__":
 	# Get the environment and extract the number of actions.
-	gridSize = 4
+	gridSize = 3
 
 	random.seed(int(time.time()))
 	np.random.seed(int(time.time()))
@@ -55,9 +55,9 @@ if __name__ == "__main__":
 	# even the metrics!
 	memory = SequentialMemory(limit=memory_size, window_length=window_length)
 
-	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=1.0, value_min=.05, value_test=.05, nb_steps=10000)
+	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=0.25, value_min=.05, value_test=.01, nb_steps=100000)
 
-	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=5000, gamma=.99, target_model_update=10000, train_interval=4, delta_clip=1.)
+	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=5000, gamma=.99, target_model_update=1000, train_interval=4, delta_clip=1.)
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 

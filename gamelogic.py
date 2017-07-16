@@ -1,5 +1,4 @@
 import random
-from copy import copy, deepcopy
 from datetime import datetime
 import numpy as np
 import time

@@ -29,7 +29,7 @@ class LivePlotCallback(Callback):
 
 if __name__ == "__main__":
 	# Get the environment and extract the number of actions.
-	gridSize = 4
+	gridSize = 3
 
 	random.seed(int(time.time()))
 	np.random.seed(int(time.time()))
