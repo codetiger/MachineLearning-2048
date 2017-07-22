@@ -49,22 +49,22 @@ class Agent:
 
 		self.env = GameLogic(size = self.GRID_SIZE)
 
-		input_layer = Input(shape=(1, self.GRID_SIZE * self.GRID_SIZE))
+		# input_layer = Input(shape=(1, self.GRID_SIZE * self.GRID_SIZE))
 
-		layer = Dense(8)(input_layer)
-		output_layer = Dense(3)(layer)
+		# layer = Dense(8)(input_layer)
+		# output_layer = Dense(3)(layer)
 		
-		self.model = Model(input_layer, output_layer)
-		self.model.compile(Adam(), 'mse')
+		# self.model = Model(input_layer, output_layer)
+		# self.model.compile(Adam(), 'mse')
 
-		# self.model = Sequential()
-		# self.model.add(Flatten(input_shape=(window_length, self.GRID_SIZE * self.GRID_SIZE)))
-		# self.model.add(Dense(nb_hidden))
-		# self.model.add(Activation('relu'))
-		# self.model.add(Dense(nb_hidden))
-		# self.model.add(Activation('relu'))
-		# self.model.add(Dense(nb_actions, activation='linear'))
-		# print(self.model.summary())
+		self.model = Sequential()
+		self.model.add(Flatten(input_shape=(window_length, self.GRID_SIZE * self.GRID_SIZE)))
+		self.model.add(Dense(nb_hidden))
+		self.model.add(Activation('relu'))
+		self.model.add(Dense(nb_hidden))
+		self.model.add(Activation('relu'))
+		self.model.add(Dense(nb_actions, activation='linear'))
+		print(self.model.summary())
 
 		self.es = EvolutionStrategy(self.model.get_weights(), self.get_reward, self.POPULATION_SIZE, self.SIGMA, self.LEARNING_RATE)
 		self.exploration = self.INITIAL_EXPLORATION
@@ -73,11 +73,11 @@ class Agent:
 		prediction = self.model.predict(np.array(sequence))
 		return prediction
 
-	def load(self, filename='weights.pkl'):
+	def load(self, filename='data/weights.pkl'):
 		self.model.load_weights(filename)
 		self.es.weights = self.model.get_weights()
 
-	def save(self, filename='weights.pkl'):
+	def save(self, filename='data/weights.pkl'):
 		self.model.save_weights(filename, overwrite=True)
 
 	def play(self, episodes, render=True):
@@ -121,7 +121,7 @@ class Agent:
 
 		pylab.plot(self.plotEpisodes, self.plotScores, '-b', label='Score')
 		pylab.plot(self.plotEpisodes, self.plotMaxTiles, '-r', label='Max Tile')
-		pylab.savefig('evostra_{}_{}x.png'.format(ENV_NAME, self.GRID_SIZE))
+		pylab.savefig('data/evostra_{}_{}x.png'.format(ENV_NAME, self.GRID_SIZE))
 
 		print("Game Score: {} Max Tile: {} Exploration: {}".format(self.env._score, 2**self.env._getMaxNumber(), self.exploration))
 		return total_reward/self.EPS_AVG
@@ -133,6 +133,6 @@ try:
 except:
 	pass
 
-agent.train(10)
+agent.train(1000)
 agent.save()
 

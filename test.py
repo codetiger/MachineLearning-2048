@@ -73,9 +73,9 @@ if __name__ == "__main__":
 	
 	dqn.compile(Adam(lr=.00025), metrics=['mae'])
 
-	dqn.load_weights('dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize))
+	dqn.load_weights('data/dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize))
 
-	cbs = [LivePlotCallback(env=env, filePath='dqn_{}_test_{}x.csv'.format(ENV_NAME, gridSize))]
+	cbs = [LivePlotCallback(env=env, filePath='data/dqn_{}_test_{}x.csv'.format(ENV_NAME, gridSize))]
 
 	env._verbose = 1
 	env.reset()
