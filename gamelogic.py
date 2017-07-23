@@ -21,12 +21,13 @@ class GameLogic:
 		self._score = 0
 		self._invalidMoveCounter = 0
 
+		self._fillEmptyGrid()
+
 		if self._reset2RandomBoard:
 			self._generateRandomBoard()
-		else:
-			self._fillEmptyGrid()
-			self._addNewNumber()
-			self._addNewNumber()
+
+		self._addNewNumber()
+		self._addNewNumber()
 
 		return self._getState()
 
@@ -189,10 +190,6 @@ class GameLogic:
 			return False
 
 	def _generateRandomBoard(self):
-		self._fillEmptyGrid()
-		numRandTiles = random.randint(2, self._gridSize*self._gridSize)
-
-		for n in range(numRandTiles):
-			x = random.randint(0, self._gridSize-1)
-			y = random.randint(0, self._gridSize-1)
-			self._gridMatrix[x][y] = random.randint(0, self._gridSize - 1)
+		x = random.randint(0, self._gridSize-1)
+		y = random.randint(0, self._gridSize-1)
+		self._gridMatrix[x][y] = 7
