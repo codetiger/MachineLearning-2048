@@ -55,7 +55,7 @@ if __name__ == "__main__":
 	# even the metrics!
 	memory = SequentialMemory(limit=memory_size, window_length=window_length)
 
-	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=0.25, value_min=.05, value_test=.01, nb_steps=100000)
+	policy = LinearAnnealedPolicy(EpsGreedyQPolicy(), attr='eps', value_max=0.05, value_min=.05, value_test=.01, nb_steps=100000)
 
 	dqn = DQNAgent(model=model, nb_actions=nb_actions, policy=policy, memory=memory, nb_steps_warmup=5000, gamma=.99, target_model_update=1000, train_interval=4, delta_clip=1.)
 	
@@ -68,7 +68,7 @@ if __name__ == "__main__":
 	# Okay, now it's time to learn something! We visualize the training here for show, but this
 	# slows down training quite a lot. You can always safely abort the training prematurely using
 	# Ctrl + C.
-	dqn.fit(env, nb_steps=99999, visualize=False, verbose=1)
+	dqn.fit(env, nb_steps=8*36*100*1000, visualize=False, verbose=1)
 
 	# After training is done, we save the final weights.
 	dqn.save_weights('data/dqn_{}_weights_{}x.h5f'.format(ENV_NAME, gridSize), overwrite=True)
